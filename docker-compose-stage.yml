@@ -1,0 +1,111 @@
+# Deployment to DockerSwarm for stage env.
+version: '3.4'
+services:
+  api_catalog:
+    image: registry.foxtrot.ua/evinent/foxtrot-api-catalog:${tag:-stage}
+    logging:
+      options:
+        max-size: 100m
+        max-file: "3"
+    ports:
+      - "56719:56718"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 0
+        window: 120s
+      update_config:
+        parallelism: 1
+        order: start-first
+        delay: 10s
+        failure_action: continue
+
+  api_cms:
+    image: registry.foxtrot.ua/evinent/foxtrot-api-cms:${tag:-stage}
+    logging:
+      options:
+        max-size: 100m
+        max-file: "3"
+    ports:
+      - "3280:80"
+      - "32443:443"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 0
+        window: 120s
+      update_config:
+        parallelism: 1
+        order: start-first
+        delay: 10s
+        failure_action: continue
+
+  api_exchange:
+    image: registry.foxtrot.ua/evinent/foxtrot-api-exchange:${tag:-stage}
+    logging:
+      options:
+        max-size: 100m
+        max-file: "3"
+    ports:
+      - "3380:80"
+      - "33443:443"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 0
+        window: 120s
+      update_config:
+        parallelism: 1
+        order: start-first
+        delay: 10s
+        failure_action: continue
+
+  api_main:
+    image: registry.foxtrot.ua/evinent/foxtrot-api-main:${tag:-stage}
+    logging:
+      options:
+        max-size: 100m
+        max-file: "3"
+    ports:
+      - "3480:80"
+      - "34443:443"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 0
+        window: 120s
+      update_config:
+        parallelism: 1
+        order: start-first
+        delay: 10s
+        failure_action: continue
+
+  site_foxtrot:
+    image: registry.foxtrot.ua/evinent/foxtrot-site:${tag:-stage}
+    logging:
+      options:
+        max-size: 100m
+        max-file: "3"
+    ports:
+      - "3580:80"
+      - "35443:443"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 0
+        window: 120s
+      update_config:
+        parallelism: 1
+        order: start-first
+        delay: 10s
+        failure_action: continue

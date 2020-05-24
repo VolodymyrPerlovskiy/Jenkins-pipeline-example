@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-catalog
+  labels:
+    app: api-catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-catalog
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+  template:
+    metadata:
+      labels:
+        app: api-catalog
+    spec:
+      containers:
+      - name: api-catalog
+        image: registry.foxtrot.ua/evinent/foxtrot-api-catalog:stage
+        imagePullPolicy: Always
+        startupProbe:
+          httpGet:
+            path: /api/health
+            port: 80
+          periodSeconds: 5
+          failureThreshold: 80
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 80
+            httpHeaders:
+              - name: Host
+                value: KubernetesLivenessProbe
+          initialDelaySeconds: 60
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 80
+            httpHeaders:
+              - name: Host
+                value: KubernetesLivenessProbe
+          initialDelaySeconds: 60
+          failureThreshold: 3
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        resources:
+          requests:
+            memory: "400Mi"
+            cpu: "300m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: local-registry
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-catalog
+spec:
+  selector:
+    app: api-catalog
+  ports:
+    - port: 8616
+      targetPort: 80
+  clusterIP: 10.233.26.221
+  externalTrafficPolicy: Local
+  type: NodePort
